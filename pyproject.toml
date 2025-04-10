@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "i6_rsync"
-version = "0.0.0"
+version = "1.0.0"
 authors = [{ name = "Mahdi Mir", email = "imahdimir@gmail.com" }]
 description = "make rsync between local and remote directories easy and fast"
 readme = "README.md"
 license = { file = "LICENSE" }
 dependencies = [
-  "pyperclip==1.9.0",
+    "pyperclip==1.9.0",
 ]
 
 keywords = [
