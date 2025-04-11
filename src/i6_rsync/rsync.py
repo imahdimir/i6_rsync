@@ -10,13 +10,13 @@ import pyperclip
 import time
 
 
-def print_rsync_cmds_and_copy_desired_one_to_clipboard_and_execute(hostname: str ,
-                                                                   remote_path: pathlib.Path ,
-                                                                   local_path: pathlib.Path ,
-                                                                   command_to_clipboard: int = None ,
-                                                                   command_to_execute: int = None ,
-                                                                   verbose: bool = True
-                                                                   ) :
+def display_copy_execute_rsync(hostname: str ,
+                               remote_path: pathlib.Path ,
+                               local_path: pathlib.Path ,
+                               command_to_clipboard: int = None ,
+                               command_to_execute: int = None ,
+                               verbose: bool = True
+                               ) :
     """
     Display and optionally copy or execute rsync commands for syncing files between
     a local and a remote machine over SSH.
@@ -50,6 +50,44 @@ def print_rsync_cmds_and_copy_desired_one_to_clipboard_and_execute(hostname: str
     verbose : bool, default=True
         If True, print all available rsync commands and execution status messages.
         If False, suppresses all printed output.
+
+    Behavior
+    --------
+    - The function builds and prints four rsync command options for syncing files.
+    - If `command_to_clipboard` is given, the associated command is copied to the clipboard.
+    - If `command_to_execute` is given, the command is executed directly using the system shell.
+    - If both clipboard and execution options are used, the same command may be copied and run.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> display_copy_execute_rsync(
+    ...     hostname='myserver',
+    ...     remote_path=Path('/remote/data'),
+    ...     local_path=Path('/local/data'),
+    ...     command_to_clipboard=1,
+    ...     command_to_execute=1,
+    ...     verbose=True
+    ... )
+
+    Output:
+    1. Sync from remote to local
+    rsync -avz myserver:/remote/data/ /local/data
+
+    ...
+    [Copied to clipboard] Sync from remote to local:
+    rsync -avz myserver:/remote/data/ /local/data
+
+    [Executing] Sync from remote to local:
+    rsync -avz myserver:/remote/data/ /local/data
+
+    ✅ Command executed successfully.
+
+
+    # Show available rsync command options
+    # prints -help, if command_to_clipboard and command_to_execute are None, nothing inputed
+    >>> display_copy_execute_rsync('g01', Path('/remote/data'), Path('/local/data'))
+
     """
 
     if not isinstance(remote_path , pathlib.Path) :
@@ -80,27 +118,27 @@ def print_rsync_cmds_and_copy_desired_one_to_clipboard_and_execute(hostname: str
         if command_to_clipboard not in commands :
             raise ValueError("Invalid command number for clipboard.")
         pyperclip.copy(commands[command_to_clipboard])
-        print(f"[Copied to clipboard] {descriptions[command_to_clipboard]}:")
+        print(f"[Copied to clipboard] {command_to_clipboard}.{descriptions[command_to_clipboard]}:")
         print(commands[command_to_clipboard] , "\n")
 
     if command_to_execute is not None :
         if command_to_execute not in commands :
             raise ValueError("Invalid command number for execution.")
-        print(f"[Executing] {descriptions[command_to_execute]}:")
+        print(f"[Executing] {command_to_execute}.{descriptions[command_to_execute]}:")
         print(commands[command_to_execute] , "\n")
         exit_status = os.system(commands[command_to_execute])
         if exit_status == 0 :
-            print("✅ Command executed successfully.\n")
+            print(f"✅ Command {command_to_execute} executed successfully.\n")
         else :
-            print(f"❌ Command failed with exit status: {exit_status}\n")
+            print(f"❌ Command {command_to_execute} failed with exit status: {exit_status}\n")
 
 
-def rsync_loop(hostname: str ,
-               remote_path: pathlib.Path ,
-               local_path: pathlib.Path ,
-               command_to_execute = 3 ,
-               delay_seconds: int = 60
-               ) :
+def run_rsync_loop(hostname: str ,
+                   remote_path: pathlib.Path ,
+                   local_path: pathlib.Path ,
+                   command_to_execute: int = None ,
+                   delay_seconds: int = 60
+                   ) :
     """
     Continuously run a rsync command in a loop with a specified delay between iterations.
 
@@ -132,13 +170,14 @@ def rsync_loop(hostname: str ,
 
     Behavior
     --------
+    - Prints available rsync commands.
     - Runs until interrupted by the user (via Ctrl+C).
     - Executes the specified rsync command every `delay_seconds` seconds.
     - Prints the command being executed and a wait message between iterations.
 
     Example
     -------
-    >>> rsync_loop(
+    >>> run_rsync_loop(
             hostname="myserver",
             remote_path=pathlib.Path("/remote/path"),
             local_path=pathlib.Path("/local/path"),
@@ -147,7 +186,10 @@ def rsync_loop(hostname: str ,
         )
     """
 
-    _f = print_rsync_cmds_and_copy_desired_one_to_clipboard_and_execute
+    _f = display_copy_execute_rsync
+
+    # print -help
+    _f(hostname , remote_path , local_path)
 
     try :
         while True :

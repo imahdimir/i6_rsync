@@ -1,3 +1,2 @@
-from .rsync import \
-    print_rsync_cmds_and_copy_desired_one_to_clipboard_and_execute
-from .rsync import rsync_loop
+from .rsync import display_copy_execute_rsync
+from .rsync import run_rsync_loop
