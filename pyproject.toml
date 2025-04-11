@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "i6_rsync"
-version = "2.0.0"
+version = "2.0.1"
 authors = [{ name = "Mahdi Mir", email = "imahdimir@gmail.com" }]
 description = "make rsync between local and remote directories easy and fast"
 readme = "README.md"

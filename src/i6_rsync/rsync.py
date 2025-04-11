@@ -10,20 +10,20 @@ import pyperclip
 import time
 
 
-def display_copy_execute_rsync(hostname: str ,
-                               remote_path: pathlib.Path ,
-                               local_path: pathlib.Path ,
-                               command_to_clipboard: int = None ,
-                               command_to_execute: int = None ,
-                               verbose: bool = True
-                               ) :
+def display_copy_execute_rsync(hostname: str,
+                               remote_path: pathlib.Path,
+                               local_path: pathlib.Path,
+                               command_to_clipboard: int = None,
+                               command_to_execute: int = None,
+                               verbose: bool = True):
     """
-    Display and optionally copy or execute rsync commands for syncing files between
+    Display, copy to clipboard, or execute rsync commands for syncing files between
     a local and a remote machine over SSH.
 
-    Requirements:
-    - `rsync` must be installed on both local and remote machines.
-    - SSH access should be configured (e.g., via SSH keys and ~/.ssh/config).
+    Requirements
+    ------------
+    - `rsync` must be installed on both the local and remote machines.
+    - SSH access should be configured (e.g., via SSH keys and `~/.ssh/config`).
 
     Parameters
     ----------
@@ -45,21 +45,22 @@ def display_copy_execute_rsync(hostname: str ,
 
     command_to_execute : int, optional
         If provided, the corresponding rsync command will be executed.
-        Should be the same as `command_to_clipboard` for clarity.
+        Should match `command_to_clipboard` if both are used.
 
     verbose : bool, default=True
-        If True, print all available rsync commands and execution status messages.
+        If True, prints all available rsync commands and status messages.
         If False, suppresses all printed output.
 
     Behavior
     --------
-    - The function builds and prints four rsync command options for syncing files.
-    - If `command_to_clipboard` is given, the associated command is copied to the clipboard.
-    - If `command_to_execute` is given, the command is executed directly using the system shell.
-    - If both clipboard and execution options are used, the same command may be copied and run.
+    - Prints four rsync command options for file synchronization.
+    - If `command_to_clipboard` is provided, the specified command is copied to the clipboard.
+    - If `command_to_execute` is provided, the specified command is executed via the system shell.
+    - If both are provided, the same command can be copied and executed.
 
     Examples
     --------
+    Example 1: Copy and execute the rsync command from remote to local
     >>> from pathlib import Path
     >>> display_copy_execute_rsync(
     ...     hostname='myserver',
@@ -74,20 +75,42 @@ def display_copy_execute_rsync(hostname: str ,
     1. Sync from remote to local
     rsync -avz myserver:/remote/data/ /local/data
 
-    ...
-    [Copied to clipboard] Sync from remote to local:
+    2. Sync from local to remote
+    rsync -avz /local/data/ myserver:/remote/data
+
+    3. Sync from remote to local (with --delete)
+    rsync -avz --delete myserver:/remote/data/ /local/data
+
+    4. Sync from local to remote (with --delete)
+    rsync -avz --delete /local/data/ myserver:/remote/data
+
+    [Copied to clipboard] 1. Sync from remote to local:
     rsync -avz myserver:/remote/data/ /local/data
 
-    [Executing] Sync from remote to local:
+    [Executing] 1. Sync from remote to local:
     rsync -avz myserver:/remote/data/ /local/data
 
-    ✅ Command executed successfully.
+    ✅ Command 1 executed successfully.
 
+    Example 2: Show available rsync commands only
+    >>> display_copy_execute_rsync(
+    ...     hostname='g01',
+    ...     remote_path=Path('/remote/data'),
+    ...     local_path=Path('/local/data')
+    ... )
 
-    # Show available rsync command options
-    # prints -help, if command_to_clipboard and command_to_execute are None, nothing inputed
-    >>> display_copy_execute_rsync('g01', Path('/remote/data'), Path('/local/data'))
+    Output:
+    1. Sync from remote to local
+    rsync -avz g01:/remote/data/ /local/data
 
+    2. Sync from local to remote
+    rsync -avz /local/data/ g01:/remote/data
+
+    3. Sync from remote to local (with --delete)
+    rsync -avz --delete g01:/remote/data/ /local/data
+
+    4. Sync from local to remote (with --delete)
+    rsync -avz --delete /local/data/ g01:/remote/data
     """
 
     if not isinstance(remote_path , pathlib.Path) :
